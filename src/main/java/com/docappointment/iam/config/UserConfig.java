@@ -18,12 +18,14 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toH2Console;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
-public class UserConfig {
+public class UserConfig implements WebMvcConfigurer {
 	
 	@Autowired
 	@Lazy
@@ -39,18 +41,26 @@ public class UserConfig {
 	@Autowired
 	private UserDao repo;
 
-	
+	@Override
+	public void addCorsMappings(CorsRegistry registry) {
+		registry.addMapping("/**")
+				.allowedOriginPatterns("*")
+				.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+				.allowedHeaders("*")
+				.allowCredentials(true);
+	}
+
 	@Bean
 	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-	
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http
                 .authorizeHttpRequests(auth ->
                         auth
-                                .requestMatchers("/users/token", "/users/login", "/users/validate", "/users/register", "/h2-console/**").permitAll()
+								.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+								.requestMatchers("/users/token", "/users/login", "/users/validate", "/users/register", "/h2-console/**").permitAll()
 								.requestMatchers(toH2Console()).permitAll()
 								.requestMatchers(HttpMethod.POST, "/doctor/**").hasAnyAuthority("ADMIN")
 								.requestMatchers(HttpMethod.PUT, "/doctor/**").hasAnyAuthority("ADMIN")
