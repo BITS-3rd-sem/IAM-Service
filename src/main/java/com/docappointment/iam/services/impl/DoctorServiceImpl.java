@@ -1,5 +1,6 @@
 package com.docappointment.iam.services.impl;
 
+import com.docappointment.iam.entities.PatientDetails;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.docappointment.iam.dao.DoctorDetailsDao;
 import com.docappointment.iam.dao.UserDao;
@@ -50,8 +51,9 @@ public class DoctorServiceImpl implements DoctorService {
         Optional<User> user = userDao.findById(doctorId);
         Optional<DoctorDetails> doctorDetails = doctorDetailsDao.findById(doctorId);
 
-        if (user.isPresent() && doctorDetails.isPresent()) {
-            return mergeUserAndDetails(user.get(), doctorDetails.get());
+        if (user.isPresent()) {
+            DoctorDetails doctorDetails1 = doctorDetails.orElseGet(DoctorDetails::new);
+            return mergeUserAndDetails(user.get(), doctorDetails1);
         }
 
         return null;
@@ -73,6 +75,7 @@ public class DoctorServiceImpl implements DoctorService {
         ObjectMapper objectMapper = new ObjectMapper();
 
         DoctorDTO doctorDTO = objectMapper.convertValue(doctorDetails, DoctorDTO.class);
+        doctorDTO.setUserId(user.getUserId());
         doctorDTO.setname(user.getName());
         doctorDTO.setEmail(user.getEmail());
         doctorDTO.setRole(user.getRole());

@@ -29,8 +29,9 @@ public class PatientServiceImpl implements PatientService {
         Optional<User> user = userDao.findById(patientId);
         Optional<PatientDetails> patientDetails = patientDetailsDao.findById(patientId);
 
-        if (user.isPresent() && patientDetails.isPresent()) {
-            return mergeUserAndDetails(user.get(), patientDetails.get());
+        if (user.isPresent()) {
+            PatientDetails patientDetails1 = patientDetails.orElseGet(PatientDetails::new);
+            return mergeUserAndDetails(user.get(), patientDetails1);
         }
 
         return null;
@@ -56,6 +57,7 @@ public class PatientServiceImpl implements PatientService {
         ObjectMapper objectMapper = new ObjectMapper();
 
         PatientDTO patientDTO = objectMapper.convertValue(patientDetails, PatientDTO.class);
+        patientDTO.setUserId(user.getUserId());
         patientDTO.setname(user.getName());
         patientDTO.setEmail(user.getEmail());
         patientDTO.setRole(user.getRole());
