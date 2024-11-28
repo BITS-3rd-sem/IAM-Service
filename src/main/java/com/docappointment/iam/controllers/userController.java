@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/v1/auth")
 @CrossOrigin
 public class userController {
 
@@ -32,9 +32,9 @@ public class userController {
 	private JwtService jwtService;
 
 	@PostMapping("/register")
-	public UserDTO registerUser(@Valid @RequestBody User user) {
+	public ResponseEntity<UserDTO> registerUser(@Valid @RequestBody User user) {
 		user.setRole(Role.PATIENT);
-		return this.UserServiceObj.registerUser(user);
+		return ResponseEntity.ok().body(this.UserServiceObj.registerUser(user));
 	}
 
 	@PostMapping("/login")
