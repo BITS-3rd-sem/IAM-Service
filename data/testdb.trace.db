@@ -113,3 +113,6 @@ Update users set role="ADMIN" where user_id=2 [42122-214]
 	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)
 	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
 	at java.base/java.lang.Thread.run(Thread.java:840)
+2024-11-28 20:23:43 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "SELECT * FROM USERS USERS [*]DOCTOR_DETAILS DOCTOR_DETAILS"; SQL statement:
+SELECT * FROM USERS USERS DOCTOR_DETAILS DOCTOR_DETAILS [42000-214]

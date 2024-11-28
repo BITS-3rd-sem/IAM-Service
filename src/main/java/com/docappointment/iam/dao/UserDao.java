@@ -5,6 +5,8 @@ import java.util.Optional;
 
 import com.docappointment.iam.entities.User;
 import com.docappointment.iam.enums.Role;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserDao extends JpaRepository<User, Integer> {
@@ -17,4 +19,5 @@ public interface UserDao extends JpaRepository<User, Integer> {
      */
     Optional<User> findByEmail(String email);
     List<User> findAllByRole(Role role);
+    Page<User> findByRole(Role role, Pageable pageable);
 }

@@ -1,9 +1,11 @@
 package com.docappointment.iam.controllers;
 
 import com.docappointment.iam.dto.DoctorDTO;
+import com.docappointment.iam.dto.PaginatedDoctorsDTO;
 import com.docappointment.iam.services.DoctorService;
 import com.docappointment.iam.dto.NewDoctorDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,12 +14,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/doctor")
+@RequestMapping("/api/v1/doctor")
 @CrossOrigin
 public class DoctorController {
 
@@ -25,27 +28,27 @@ public class DoctorController {
     DoctorService doctorService;
 
     @GetMapping
-    private List<DoctorDTO> getDoctors() {
-        return doctorService.getAllDoctors();
+    private ResponseEntity<PaginatedDoctorsDTO> getDoctors(@RequestParam(defaultValue = "0") int pageNumber, @RequestParam(defaultValue = "20") int pageSize) {
+        return ResponseEntity.ok().body(doctorService.getAllDoctors(pageNumber,pageSize));
     }
 
     @GetMapping ("/{id}")
-    private DoctorDTO getDoctorById(@PathVariable int id) {
-        return doctorService.getDoctorById(id);
+    private ResponseEntity<DoctorDTO> getDoctorById(@PathVariable int id) {
+        return ResponseEntity.ok().body(doctorService.getDoctorById(id));
     }
 
     @PutMapping("/{id}")
-    private DoctorDTO updateDoctorById(@RequestBody DoctorDTO doctorDTO, @PathVariable int id) {
-        return doctorService.updateDoctorDetails(doctorDTO, id);
+    private ResponseEntity<DoctorDTO> updateDoctorById(@RequestBody DoctorDTO doctorDTO, @PathVariable int id) {
+        return ResponseEntity.ok().body(doctorService.updateDoctorDetails(doctorDTO, id));
     }
 
     @DeleteMapping("/{id}")
-    private String deleteDoctorById(@PathVariable int id) {
-        return doctorService.deleteDoctor(id);
+    private ResponseEntity<String> deleteDoctorById(@PathVariable int id) {
+        return ResponseEntity.ok().body(doctorService.deleteDoctor(id));
     }
 
     @PostMapping
-    private DoctorDTO createDoctor(@RequestBody NewDoctorDTO doctorDTO) {
-        return doctorService.createDoctor(doctorDTO);
+    private ResponseEntity<DoctorDTO> createDoctor(@RequestBody NewDoctorDTO doctorDTO) {
+        return ResponseEntity.ok().body(doctorService.createDoctor(doctorDTO));
     }
 }

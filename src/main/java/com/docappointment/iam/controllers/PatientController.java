@@ -1,15 +1,17 @@
 package com.docappointment.iam.controllers;
 
+import com.docappointment.iam.dto.PaginatedPatientsDTO;
 import com.docappointment.iam.dto.PatientDTO;
 import com.docappointment.iam.services.PatientService;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/patient")
+@RequestMapping("/api/v1/patient")
 @CrossOrigin
 public class PatientController {
     
@@ -17,24 +19,24 @@ public class PatientController {
     PatientService patientService;
 
     @GetMapping
-    private List<PatientDTO> getPatients() {
-        return patientService.getAllPatients();
+    private ResponseEntity<PaginatedPatientsDTO> getPatients(@RequestParam(defaultValue = "0") int pageNumber, @RequestParam(defaultValue = "20") int pageSize) {
+        return ResponseEntity.ok().body(patientService.getAllPatients(pageNumber, pageSize));
     }
 
     @GetMapping ("/{id}")
-    private PatientDTO getPatientById(@PathVariable int id) {
-        return patientService.getPatientById(id);
+    private ResponseEntity<PatientDTO> getPatientById(@PathVariable int id) {
+        return ResponseEntity.ok().body(patientService.getPatientById(id));
     }
 
     @PutMapping("/{id}")
     @RolesAllowed({"ADMIN", "PATIENT"})
-    private PatientDTO updatePatientById(@RequestBody PatientDTO patientDTO, @PathVariable int id) {
-        return patientService.updatePatientDetails(patientDTO, id);
+    private ResponseEntity<PatientDTO> updatePatientById(@RequestBody PatientDTO patientDTO, @PathVariable int id) {
+        return ResponseEntity.ok().body(patientService.updatePatientDetails(patientDTO, id));
     }
 
     @DeleteMapping("/{id}")
     @RolesAllowed({"ADMIN", "PATIENT"})
-    private String deletePatientById(@PathVariable int id) {
-        return patientService.deletePatient(id);
+    private ResponseEntity<String> deletePatientById(@PathVariable int id) {
+        return ResponseEntity.ok().body(patientService.deletePatient(id));
     }
 }
