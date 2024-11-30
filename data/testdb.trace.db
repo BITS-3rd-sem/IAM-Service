@@ -1,6 +1,6 @@
-2024-11-17 13:55:15 jdbc[14]: exception
+2024-11-30 11:30:48 jdbc[13]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Column "ADMIN" not found; SQL statement:
-Update users set role="ADMIN" where user_id=2 [42122-214]
+Update USERS set ROLE="ADMIN" where USER_ID=2 [42122-214]
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:502)
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:477)
 	at org.h2.message.DbException.get(DbException.java:223)
@@ -54,13 +54,13 @@ Update users set role="ADMIN" where user_id=2 [42122-214]
 	at org.springframework.security.web.authentication.www.BasicAuthenticationFilter.doFilterInternal(BasicAuthenticationFilter.java:170)
 	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
 	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
-	at config.com.docappointment.iam.JwtAuthenticationFilter.doFilterInternal(JwtAuthenticationFilter.java:62)
-	at jdk.internal.reflect.GeneratedMethodAccessor18.invoke(Unknown Source)
+	at com.docappointment.iam.config.JwtAuthenticationFilter.doFilterInternal(JwtAuthenticationFilter.java:62)
+	at jdk.internal.reflect.GeneratedMethodAccessor22.invoke(Unknown Source)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
 	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
 	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
 	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:698)
-	at config.com.docappointment.iam.JwtAuthenticationFilter$$SpringCGLIB$$0.doFilterInternal(<generated>)
+	at com.docappointment.iam.config.JwtAuthenticationFilter$$SpringCGLIB$$0.doFilterInternal(<generated>)
 	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
 	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
 	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:107)
@@ -113,6 +113,3 @@ Update users set role="ADMIN" where user_id=2 [42122-214]
 	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)
 	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
 	at java.base/java.lang.Thread.run(Thread.java:840)
-2024-11-28 20:23:43 jdbc[13]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "SELECT * FROM USERS USERS [*]DOCTOR_DETAILS DOCTOR_DETAILS"; SQL statement:
-SELECT * FROM USERS USERS DOCTOR_DETAILS DOCTOR_DETAILS [42000-214]
