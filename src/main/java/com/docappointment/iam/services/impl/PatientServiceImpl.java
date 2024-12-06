@@ -2,13 +2,12 @@ package com.docappointment.iam.services.impl;
 
 import com.docappointment.iam.dao.PatientDetailsDao;
 import com.docappointment.iam.dao.UserDao;
-import com.docappointment.iam.dto.PaginatedDoctorsDTO;
 import com.docappointment.iam.dto.PaginatedPatientsDTO;
 import com.docappointment.iam.dto.PatientDTO;
-import com.docappointment.iam.entities.DoctorDetails;
 import com.docappointment.iam.entities.PatientDetails;
 import com.docappointment.iam.entities.User;
 import com.docappointment.iam.enums.Role;
+import com.docappointment.iam.exceptions.InvalidDataException;
 import com.docappointment.iam.exceptions.ResourceNotFoundException;
 import com.docappointment.iam.services.PatientService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,6 +21,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class PatientServiceImpl implements PatientService {
@@ -48,6 +49,18 @@ public class PatientServiceImpl implements PatientService {
 
     @Override
     public PaginatedPatientsDTO getAllPatients(int pageNumber, int pageSize) {
+        if (pageNumber < 0) {
+            throw new InvalidDataException("pageNumber cannot be negative");
+        }
+
+        if (pageSize < 0) {
+            throw new InvalidDataException("pageSize cannot be negative");
+        }
+
+        if (pageSize > 200) {
+            throw new InvalidDataException("pageSize cannot be more than 200");
+        }
+
         List<PatientDTO> patients = new ArrayList<>();
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Order.asc("userId")));
         Page<User> paginatedUsers = userDao.findByRole(Role.PATIENT, pageable);
@@ -100,6 +113,7 @@ public class PatientServiceImpl implements PatientService {
     @Override
     public PatientDTO updatePatientDetails(PatientDTO patientDTO, int id) {
         if (userDao.existsById(id)) {
+            ValidatePatientDetails(patientDTO);
             ObjectMapper objectMapper = new ObjectMapper();
 
             Optional<User> user = userDao.findById(id);
@@ -124,5 +138,27 @@ public class PatientServiceImpl implements PatientService {
         dto.setTotalPatients((int) paginatedData.getTotalElements());
 
         return dto;
+    }
+
+    private void ValidatePatientDetails(PatientDTO patientDTO) {
+         if (patientDTO.getAge() < 1) {
+             throw new InvalidDataException("Invalid age value");
+         }
+
+        if (patientDTO.getHeight() < 1f) {
+            throw new InvalidDataException("Invalid height value");
+        }
+
+        if (patientDTO.getWeight() < 1f) {
+            throw new InvalidDataException("Invalid weight value");
+        }
+
+        String regex = "^\\+91\\d{10}$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(patientDTO.getPhoneNo());
+
+        if (!matcher.matches()) {
+            throw new InvalidDataException("Invalid phone no value, accepatble format: +91XXXXXXXXXX");
+        }
     }
 }

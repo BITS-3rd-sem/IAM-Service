@@ -12,7 +12,7 @@ public interface DoctorService {
 
     DoctorDTO getDoctorById(int doctorId);
 
-    PaginatedDoctorsDTO getAllDoctors(int pageNumber, int pageSize);
+    PaginatedDoctorsDTO getAllDoctors(int pageNumber, int pageSize, String specialization);
 
     String deleteDoctor(int id);
 

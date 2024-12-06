@@ -28,8 +28,11 @@ public class DoctorController {
     DoctorService doctorService;
 
     @GetMapping
-    private ResponseEntity<PaginatedDoctorsDTO> getDoctors(@RequestParam(defaultValue = "0") int pageNumber, @RequestParam(defaultValue = "20") int pageSize) {
-        return ResponseEntity.ok().body(doctorService.getAllDoctors(pageNumber,pageSize));
+    private ResponseEntity<PaginatedDoctorsDTO> getDoctors(
+            @RequestParam(defaultValue = "0") int pageNumber,
+            @RequestParam(defaultValue = "20") int pageSize,
+            @RequestParam(required = false) String specialization) {
+        return ResponseEntity.ok().body(doctorService.getAllDoctors(pageNumber,pageSize, specialization));
     }
 
     @GetMapping ("/{id}")
