@@ -2,6 +2,7 @@ package com.docappointment.iam.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -50,11 +51,26 @@ public class GlobalExceptionHandler {
 		ApiResponse error = new ApiResponse("error", "Inavlid email or password");
 		return new ResponseEntity<ApiResponse>(error, HttpStatus.UNAUTHORIZED);
     }
+
+	@ExceptionHandler({ InvalidDataException.class })
+	public ResponseEntity<ApiResponse> handleInvalidDataException(InvalidDataException ex) {
+
+		ApiResponse error = new ApiResponse("error", ex.getMessage());
+		return new ResponseEntity<ApiResponse>(error, HttpStatus.BAD_REQUEST);
+	}
+
+
+	@ExceptionHandler({ HttpMessageNotReadableException.class })
+	public ResponseEntity<ApiResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+
+		ApiResponse error = new ApiResponse("error", "Invalid data provided");
+		return new ResponseEntity<ApiResponse>(error, HttpStatus.BAD_REQUEST);
+	}
 	
-//	@ExceptionHandler({ RuntimeException.class })
-//    public ResponseEntity<ApiResponse> handleRuntimeException(RuntimeException ex) {
-//
-//		ApiResponse error = new ApiResponse("error", "Unknown error occured");
-//		return new ResponseEntity<ApiResponse>(error, HttpStatus.INTERNAL_SERVER_ERROR);
-//    }
+	@ExceptionHandler({ RuntimeException.class })
+    public ResponseEntity<ApiResponse> handleRuntimeException(RuntimeException ex) {
+
+		ApiResponse error = new ApiResponse("error", "Unknown error occured");
+		return new ResponseEntity<ApiResponse>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

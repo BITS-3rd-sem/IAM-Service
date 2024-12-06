@@ -60,7 +60,7 @@ public class UserConfig implements WebMvcConfigurer {
                 .authorizeHttpRequests(auth ->
                         auth
 								.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-								.requestMatchers("/api/v1/auth/token", "/api/v1/auth/login", "/api/v1/auth/validate", "/api/v1/auth/register", "/h2-console/**", "/specialization").permitAll()
+								.requestMatchers("/api/v1/auth/token", "/api/v1/auth/login", "/api/v1/auth/validate", "/api/v1/auth/register", "/h2-console/**", "/api/v1/specialization").permitAll()
 								.requestMatchers(toH2Console()).permitAll()
 								.requestMatchers(HttpMethod.POST, "/api/v1/doctor/**").hasAnyAuthority("ADMIN")
 								.requestMatchers(HttpMethod.PUT, "/api/v1/doctor/**").hasAnyAuthority("ADMIN")

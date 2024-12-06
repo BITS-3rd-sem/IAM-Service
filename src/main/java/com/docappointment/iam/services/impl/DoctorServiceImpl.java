@@ -1,19 +1,19 @@
 package com.docappointment.iam.services.impl;
 
-import com.docappointment.iam.dto.PaginatedDoctorsDTO;
-import com.docappointment.iam.entities.PatientDetails;
-import com.docappointment.iam.exceptions.ResourceNotFoundException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.docappointment.iam.dao.DoctorDetailsDao;
 import com.docappointment.iam.dao.UserDao;
 import com.docappointment.iam.dto.DoctorDTO;
 import com.docappointment.iam.dto.NewDoctorDTO;
+import com.docappointment.iam.dto.PaginatedDoctorsDTO;
 import com.docappointment.iam.dto.UserDTO;
 import com.docappointment.iam.entities.DoctorDetails;
 import com.docappointment.iam.entities.User;
 import com.docappointment.iam.enums.Role;
+import com.docappointment.iam.exceptions.InvalidDataException;
+import com.docappointment.iam.exceptions.ResourceNotFoundException;
 import com.docappointment.iam.services.DoctorService;
 import com.docappointment.iam.services.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,6 +24,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class DoctorServiceImpl implements DoctorService {
@@ -39,6 +41,7 @@ public class DoctorServiceImpl implements DoctorService {
 
     @Override
     public DoctorDTO createDoctor(NewDoctorDTO doctorDTO) {
+        ValidateDoctorDetails(doctorDTO);
         ObjectMapper objectMapper = new ObjectMapper();
         User user = objectMapper.convertValue(doctorDTO, User.class);
         user.setRole(Role.DOCTOR);
@@ -66,16 +69,40 @@ public class DoctorServiceImpl implements DoctorService {
     }
 
     @Override
-    public PaginatedDoctorsDTO getAllDoctors(int pageNumber, int pageSize) {
+    public PaginatedDoctorsDTO getAllDoctors(int pageNumber, int pageSize, String specialization) {
+        if (pageNumber < 0) {
+            throw new InvalidDataException("pageNumber cannot be negative");
+        }
+
+        if (pageSize < 0) {
+            throw new InvalidDataException("pageSize cannot be negative");
+        }
+
+        if (pageSize > 200) {
+            throw new InvalidDataException("pageSize cannot be more than 200");
+        }
+
         List<DoctorDTO> doctors = new ArrayList<>();
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Order.asc("userId")));
+
         Page<User> paginatedUsers = userDao.findByRole(Role.DOCTOR, pageable);
+
         List<User> users = paginatedUsers.getContent();
 
         for (User user: users) {
             Optional<DoctorDetails> doctorDetails = doctorDetailsDao.findById(user.getUserId());
-            doctorDetails.ifPresent(details -> doctors.add(mergeUserAndDetails(user, details)));
+            if (specialization == null) {
+                doctorDetails.ifPresent(details -> doctors.add(mergeUserAndDetails(user, details)));
+            } else if (specialization.isBlank()) {
+                throw new InvalidDataException("specialization cannot be blank");
+            } else {
+                doctorDetails.ifPresent(details -> {
+                    if (specialization.equals(details.getSpecialization())) {
+                        doctors.add(mergeUserAndDetails(user, details));
+                    }
+                });
+            }
         }
 
         PaginatedDoctorsDTO response = convertPaginatedDataToDTO(paginatedUsers);
@@ -117,6 +144,7 @@ public class DoctorServiceImpl implements DoctorService {
     @Override
     public DoctorDTO updateDoctorDetails(DoctorDTO doctorDTO, int id) {
         if (userDao.existsById(id) && doctorDetailsDao.existsById(id)) {
+            ValidateDoctorDetails(doctorDTO);
             ObjectMapper objectMapper = new ObjectMapper();
 
             Optional<User> user = userDao.findById(id);
@@ -146,5 +174,105 @@ public class DoctorServiceImpl implements DoctorService {
     @Override
     public List<String> getAllSpecializations() {
         return doctorDetailsDao.findDistinctSpecializations();
+    }
+
+    private void ValidateDoctorDetails(NewDoctorDTO doctorDTO) {
+        if (doctorDTO.getExperience() < 0) {
+            throw new InvalidDataException("Invalid experience value");
+        }
+
+        if (doctorDTO.getFees() < 0) {
+            throw new InvalidDataException("Invalid Fees value");
+        }
+
+        if (doctorDTO.getRating() < 0) {
+            throw new InvalidDataException("Invalid rating value");
+        }
+
+        if (doctorDTO.getSpecialization() == null || doctorDTO.getSpecialization().isBlank()) {
+            throw new InvalidDataException("Invalid specialization value");
+        }
+
+        if (doctorDTO.getLicense() == null || doctorDTO.getLicense().isBlank()) {
+            throw new InvalidDataException("Invalid Licence value");
+        }
+
+        if (doctorDTO.getRole().equals(Role.DOCTOR)) {
+            throw new InvalidDataException("Invalid role value");
+        }
+
+        if (doctorDTO.getDegrees().isEmpty()) {
+            throw new InvalidDataException("Invalid degrees value");
+        }
+
+        if (doctorDTO.getKnownLanguages().isEmpty()) {
+            throw new InvalidDataException("Invalid known languages value");
+        }
+
+        if (doctorDTO.getname() == null || doctorDTO.getname().isBlank()) {
+            throw new InvalidDataException("Invalid name value");
+        }
+
+        if (doctorDTO.getEmail() == null || doctorDTO.getEmail().isBlank()) {
+            throw new InvalidDataException("Invalid email value");
+        }
+
+        String regex = "^\\+91\\d{10}$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(doctorDTO.getPhoneNo());
+
+        if (matcher.matches()) {
+            throw new InvalidDataException("Invalid phone no value");
+        }
+    }
+
+    private void ValidateDoctorDetails(DoctorDTO doctorDTO) {
+        if (doctorDTO.getExperience() < 0) {
+            throw new InvalidDataException("Invalid experience value");
+        }
+
+        if (doctorDTO.getFees() < 0) {
+            throw new InvalidDataException("Invalid Fees value");
+        }
+
+        if (doctorDTO.getRating() < 0) {
+            throw new InvalidDataException("Invalid rating value");
+        }
+
+        if (doctorDTO.getSpecialization() == null || doctorDTO.getSpecialization().isBlank()) {
+            throw new InvalidDataException("Invalid specialization value");
+        }
+
+        if (doctorDTO.getLicense() == null || doctorDTO.getLicense().isBlank()) {
+            throw new InvalidDataException("Invalid Licence value");
+        }
+
+        if (!doctorDTO.getRole().equals(Role.DOCTOR)) {
+            throw new InvalidDataException("Invalid role value");
+        }
+
+        if (doctorDTO.getDegrees().isEmpty()) {
+            throw new InvalidDataException("Invalid degrees value");
+        }
+
+        if (doctorDTO.getKnownLanguages().isEmpty()) {
+            throw new InvalidDataException("Invalid known languages value");
+        }
+
+        if (doctorDTO.getname() == null || doctorDTO.getname().isBlank()) {
+            throw new InvalidDataException("Invalid name value");
+        }
+
+        if (doctorDTO.getEmail() == null || doctorDTO.getEmail().isBlank()) {
+            throw new InvalidDataException("Invalid email value");
+        }
+
+        String regex = "^\\+91\\d{10}$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(doctorDTO.getPhoneNo());
+
+        if (!matcher.matches()) {
+            throw new InvalidDataException("Invalid phone no value, accepatble format: +91XXXXXXXXXX");
+        }
     }
 }
