@@ -12,6 +12,7 @@
 	<groupId>com.docappointment</groupId>
 	<artifactId>iam</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
 	<name>user</name>
 	<description>iam service for doctor appointment app</description>
 	<properties>
