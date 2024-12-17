@@ -120,6 +120,12 @@ public class PatientServiceImpl implements PatientService {
 
             PatientDetails patientDetails = objectMapper.convertValue(patientDTO, PatientDetails.class);
 
+            float height = (float) Math.round(patientDetails.getHeight() * 100) / 100;
+            patientDetails.setHeight(height);
+
+            float weight = (float) Math.round(patientDetails.getWeight() * 100) / 100;
+            patientDetails.setWeight(weight);
+
             PatientDetails savedPatientDetails = patientDetailsDao.save(patientDetails);
             if (user.isPresent())
                 return mergeUserAndDetails(user.get(), savedPatientDetails);
